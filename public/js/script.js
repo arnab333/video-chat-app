@@ -9,6 +9,7 @@ const peer = new Peer(undefined, {
 
 const videoEl = document.createElement('video');
 videoEl.muted = true;
+const chatPeers = {};
 
 let myVideoStream;
 navigator.mediaDevices
@@ -34,6 +35,12 @@ navigator.mediaDevices
     });
   });
 
+socket.on('user-disconnected', function (userId) {
+  if (chatPeers[userId]) {
+    chatPeers[userId].close();
+  }
+});
+
 peer.on('open', function (userId) {
   socket.emit('join-room', ROOM_ID, userId);
 });
@@ -48,7 +55,8 @@ function connectToNewUser(userId, stream) {
   call.on('close', function () {
     newVideoEl.remove();
   });
-  // peers[userId] = call;
+
+  chatPeers[userId] = call;
 }
 
 function addVideoStream(video, stream) {

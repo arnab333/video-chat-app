@@ -31,6 +31,10 @@ io.on('connection', function (socketObj) {
     socketObj.join(roomId);
     socketObj.to(roomId).broadcast.emit('user-connected', userId);
 
+    socketObj.on('disconnect', function () {
+      socketObj.to(roomId).broadcast.emit('user-disconnected', userId);
+    });
+
     // messages
     socketObj.on('message', function (message) {
       //send message to the same room
